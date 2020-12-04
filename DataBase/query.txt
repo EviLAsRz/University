@@ -1,0 +1,52 @@
+/*
+Ejercicio 3.
+
+a) pi Cliente.id_cliente, Cliente.nom_cliente, Cliente.renta_anual (sigma Cliente.renta_anual > 30000 (Cliente))
+
+b) pi Cliente.nom_cliente (sigma Cliente.id_cliente = 433 (Cliente))
+
+c) pi Embarque.destino (sigma Embarque.num_embarque = 3244 (Embarque))
+
+d) pi Embarque.id_camion (sigma Embarque.peso > 100 (Embarque))
+
+e) pi Cliente.nom_cliente (Cliente natural join (pi Embarque.id_cliente (sigma Embarque.destino = 'Vigo' (Embarque))))
+
+f) pi Embarque.destino (Embarque natural join sigma Cliente.renta_anual > 60000 (Cliente))
+*/
+
+/*
+Ejercicio 5.
+
+a) pi Embarque.num_embarque (sigma Embarque.peso > 20 (Embarque))
+
+b) pi Cliente.nom_cliente (sigma Cliente.renta_anual > 60000 (Cliente))
+
+c) pi Camion.nom_chofer (sigma Camion.id_camion = 45 (Camion))
+
+d) pi Embarque.destino (sigma Embarque.peso > 100 (Embarque))
+
+e) pi Cliente.nom_cliente, Cliente.renta_anual (Cliente natural join (pi Embarque.id_cliente (sigma Embarque.peso > 100 (Embarque))))
+
+f) pi Embarque.id_camion (sigma Embarque.peso > 100 (Embarque))
+
+g) pi Camion.nom_chofer (Camion natural join (pi Embarque.id_camion (sigma Embarque.peso > 100 (Embarque))))
+
+h) pi Embarque.destino (Embarque natural join (pi Cliente.id_cliente (sigma Cliente.renta_anual > 90000 (Cliente))))
+
+i) pi Cliente.nom_cliente (sigma Cliente.renta_anual > 90000 (Cliente) natural join (pi Embarque.id_cliente (sigma Embarque.peso < 1 (Embarque))))
+
+j) pi Cliente.nom_cliente (sigma Cliente.renta_anual > 90000 (Cliente) natural join (pi Embarque.id_cliente (sigma Embarque.peso < 1 or Embarque.destino = 'Madrid' (Embarque))))
+
+k) pi Cliente.nom_cliente (Cliente natural join (pi Embarque.id_cliente (Embarque natural join (pi Camion.id_camion (sigma Camion.nom_chofer = 'Juan' (Camion))))))
+
+l) pi Camion.nom_chofer (Camion natural join (pi Embarque.id_camion (Embarque natural join (pi Cliente.id_cliente (sigma Cliente.renta_anual > 120000 (Cliente))))))
+
+m) pi Cliente.id_cliente, Cliente.nom_cliente (Cliente natural join (pi Embarque.id_cliente, Embarque.id_camion (Embarque) ÷  pi Camion.id_camion (Camion)))
+
+n) (pi Embarque.destino, Embarque.id_cliente (Embarque) ÷ (pi Cliente.id_cliente (Cliente)))
+
+ñ) (Suponiendo cambio de nombre de la columna Embarque,destino por embarque.nomb_ciudad)
+pi Camion.nom_chofer (Camion natural join (pi Embarque.id_camion, Embarque.destino (Embarque) ÷ pi Ciudad.nomb_ciudad (Ciudad)))
+
+o)
+*/
