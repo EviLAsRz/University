@@ -1,0 +1,123 @@
+1.Listado de pesos que muestre para cada registro la diferencia entre el peso máximo y el peso mínimo.
+
+SELECT ​PESO_NOM ​"Nombre"​, ​(​PESO_MAX​-​PESO_MIN​) "Diferencia de pesos"
+FROM ​pesos​;
+
+2.Consulta que te devuelva el día de la semana que naciste.
+
+SELECT ​DAYNAME ​ (​'1998-02-19'​)​;
+
+3.Listado de países que empiezan por A. El listado deberá mostrar el nombre de los países en mayúscula.
+
+SELECT ​UPPER ​ (​pai_nombre​) "Paises"
+FROM ​paises
+WHERE ​pai_nombre ​LIKE ​'A%'​;
+
+4.Listado de proveedores que empiezan por E, ya sea letra mayúscula o minúscula. PISTA: Utilice la función UPPER y un LIKE, no es válido utilizar dos likes.
+
+SELECT ​PRV_NOM ​"Nombres de los proveedores"
+FROM ​proveedores WHERE ​UPPER ​(​PRV_NOM​) ​LIKE ​'E%'​;
+
+5.Listado de empleados mayores de 40 años.
+
+SELECT ​*
+FROM ​empleados
+WHERE ​TRUNCATE ​(​DATEDIFF ​ (​CURDATE ​ ()​,​emp_nacimiento​)/​365​, ​0​) > ​40​;
+
+6.Muestre un listado de clientes con dos columnas: en la primera columna debe aparecer el nombre completo de los clientes (nombre + apellido), mientras que en la segunda columna debe aparecer la inicial del país en mayúscula.
+
+SELECT ​CONCAT ​(​CLT_NOM​, ​' '​, ​CLT_APELL​) "Nombre Completo"​, ​UPPER ​ (​CLT_PAIS​)
+FROM ​clientes​;
+
+7.Listado de artículos cuyo precio de venta sea superior al doble del precio de compra ordenado por beneficio de manera descendente.
+
+SELECT ​*​, ​(​ART_PV​-​ART_PC​)
+FROM ​articulos WHERE ​ART_PV ​> (​2​*​ART_PC​)
+ORDER BY ​(​ART_PV​-​ART_PC​) ​DESC;
+
+8.Listado de ventas realizadas en algún día 2 (de cualquier mes y cualquier año). PISTA: no use LIKE y use la función DAY().
+
+SELECT ​*
+FROM ​ventas
+WHERE ​DAY ​(​VNT_FCH​) = ​2​;
+
+9.Listado de empleados cuyo nombre sea superior a 5 caracteres.
+
+SELECT ​*
+FROM ​empleados
+WHERE ​CHAR_LENGTH ​ (​emp_nombre​) > ​5​;
+
+10. Listado que devuelva el código de la tienda, la población y el nombre de los gerentes. Ojo, queremos sólo el nombre, no el apellido, por lo que tendrá que utilizar alguna función que extraiga el nombre de la columna TDA_GER, que contiene apellido + nombre.
+
+SELECT ​TDA_NUM ​"Código"​, ​TDA_POB ​"Población"​, ​SUBSTRING_INDEX ​ (​TDA_GER​, ','​, ​-​1​) "Nombre"
+FROM ​tiendas​; 
+
+11.Consulta que muestre el número de registros o filas que hay en la tabla proveedores.
+
+select count(*)
+from proveedores;
+
+
+12.Consulta que muestre el máximo de los pesos mínimos (peso_min) y el mínimo de los pesos máximos (peso_max).
+
+select min(peso_max)'minimo Max', max(peso_min)'Maximo Min'
+from pesos;
+
+
+13.Consulta sobre la tabla tiendas que muestre tres columnas con la siguiente información: número de tiendas totales, número de poblaciones diferentes y número de gerentes diferentes.
+
+select count(distinct tda_num) 'Numero de tiendas',count(distinct tda_pob) 'Poblaciones',count(distinct tda_ger) 'Gerentes'
+from tiendas;
+
+
+14.Consulta que muestre la media de peso de todos los artículos. 
+
+select avg(art_peso) 'Media de peso'
+from articulos;
+
+
+15.Listado que muestre el número de ventas totales que ha habido cada día.
+
+select vnt_fch 'fecha',sum(vnt_cant)'Ventas Totales'
+from ventas
+group by vnt_fch;
+
+
+16.Consulta sobre la tabla clientes que muestre el número de clientes que hay para cada población y que no muestre aquellas poblaciones que tengan únicamente 1 cliente.
+
+select clt_pob,count(clt_num) ' NªCliente'
+from clientes
+group by clt_pob
+having count(clt_num) > '1' ;
+
+
+17.Listado que muestre para cada artículo (art_nom) la siguiente información: peso máximo, precio de compra medio y precio de venta medio. El listado no deberá mostrar aquellos artículos cuyo peso sea nulo ni aquellos cuyo precio de venta medio sea inferior a 20. Además, deberá ordenarse en orden decreciente de peso máximo.
+
+SELECT ART_NOM 'Nombre del articulo', MAX(ART_PESO) 'Peso Máximo', AVG(ART_PC) 'PC medio', AVG(ART_PV) 'PV medio'
+FROM artículos
+WHERE ART_PESO IS NOT NULL
+GROUP BY ART_NOM
+HAVING  AVG(ART_PV) >= 20
+ORDER BY 2 DESC;
+
+18.Listado de ventas realizadas por las tiendas cuyo código esté comprendido entre el 10 y el 20. Para estas tiendas se desea saber el número total de ventas que ha realizado cada una y el número de unidades de todos los artículos vendidas. Nota: cada registro de la tabla ventas es en sí una venta y la cantidad de unidades vendidas es la suma de las cantidades de todas sus ventas (vnt_cant).
+
+select count(vnt_art) 'Nº Total de ventas', sum(vnt_cant) 'Cantidad de ventas',vnt_tda ' Codigo de tienda'
+from ventas
+where vnt_tda between '10' and '20'
+group by vnt_tda;
+
+19.Listado de clientes totales para cada ciudad - país. El listado deberá mostrar la ciudad, el país y el número de clientes.
+
+select clt_num 'Nº Clientes', clt_pais 'Pais', clt_pob 'Poblacion'
+from clientes
+group by clt_pais,clt_pob;
+
+
+20.Listado de artículos que muestre para cada proveedor (art_prv) cuántos artículos de cada color provee y cuál es la media de precio de compra de esos artículos. El listado no deberá mostrar informacion para los artículos de color morado ni negro. Además, el precio debe salir redondeado a dos decimales y deberá estar ordenado de mayor a menor cantidad. Nota: a continuación se muestra una tabla de ejemplo con qué información proporcionará el listado. 
+
+SELECT ART_PRV 'Proveedores', ART_COL 'Color', COUNT(ART_COL) 'Cantidad', ROUND(AVG(ART_PC),2) 'PC Medio'
+FROM articulos
+WHERE ART_COL NOT IN ('morado', 'negro') AND ART_PRV IS NOT NULL
+GROUP BY ART_COL, ART_PRV
+ORDER BY ROUND(AVG(ART_PC),2) DESC;

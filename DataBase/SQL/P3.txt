@@ -1,0 +1,144 @@
+1. Listado de artículos que pesan menos que el artículo número 2, ordenados de manera ascendente por peso.
+
+SELECT *
+FROM articulos
+WHERE ART_PESO < (SELECT art_peso FROM articulos WHERE art_num = 2) 
+ORDER BY art_peso desc;
+
+
+2. Listado de proveedores (que muestre código y nombre) que proveen algún artículo.
+
+SELECT prv_nom 'Nombre', prv_num 'Codigo'
+FROM proveedores
+WHERE prv_num IN (SELECT art_prv FROM articulos WHERE art_prv is NOT NULL);
+
+
+3. Listado de ventas que muestre las fechas en que se han vendido impresoras o de las ventas realizadas a los clientes de Madrid.
+
+SELECT vnt_fch
+FROM ventas
+WHERE vnt_art IN (SELECT art_num FROM articulos WHERE art_nom = 'impresora')
+or vnt_clt IN (SELECT clt_num FROM clientes WHERE clt_pob = 'Madrid');
+
+
+4. Listado de clientes que sean de España y que residan en la misma ciudad que los que se llaman de nombre Pablo, ordenados por su número de cliente. Aquellos que se llaman ‘Pablo’ no deben aparecer en el listado. El listado deberá ordenarse por clt_num.
+
+SELECT clt_nom 'Nombre', clt_apell 'Apellidos', clt_num 'Nº Cliente'
+FROM clientes
+WHERE clt_pais = 'e' AND clt_pob IN (SELECT clt_pob FROM clientes WHERE clt_nom = 'Pablo') AND clt_nom NOT LIKE 'Pablo' 
+ORDER BY clt_num;
+
+5. Listado de tiendas que muestre aquellas que han vendido algún artículo de color azul.
+
+SELECT tda_num 'Nº Tienda'
+FROM tiendas
+WHERE tda_num IN (SELECT art_num FROM articulos WHERE art_col = 'azul');
+
+
+6. Listado de artículos cuyo precio de venta es superior al precio de venta de todos los artículos de color blanco.
+
+SELECT art_nom 'Nombre' FROM articulos
+WHERE art_pv > ALL (SELECT art_pv FROM articulos WHERE art_col = 'blanco');
+
+
+7. Listado de clientes que hayan comprado más 3 veces. Un cliente ha comprado más de 3 veces si su código (vnt_clt) aparece en más de 3 filas en la columna vnt_clt de la tabla ventas.
+
+SELECT *
+FROM clientes
+WHERE clt_num IN (SELECT vnt_clt FROM ventas GROUP BY vnt_clt HAVING COUNT(*) > 3);
+
+
+8. Listado tiendas (código y nombre) en las que han comprado los clientes de Madrid.
+
+SELECT *
+FROM tiendas
+WHERE tda_num IN (SELECT vnt_tda FROM ventas WHERE vnt_clt IN (SELECT clt_num FROM clientes WHERE clt_pob = 'Madrid'));
+
+
+9. Listado de artículos cuyo precio de compra (art_pc) sea superior al precio de venta del artículo más barato de color malva.
+
+SELECT art_nom 'Nombre'
+FROM articulos
+WHERE art_pc > (SELECT MIN(art_pv) FROM articulos WHERE art_col = 'malva');
+
+
+10.Listado de que muestre el proveedor que provee el artículo que más veces se ha vendido.  
+
+SELECT *
+FROM proveedores
+WHERE prv_num = (SELECT art_prv FROM articulos WHERE art_num = (SELECT vnt_art FROM ventas GROUP BY vnt_art HAVING COUNT(*) >= ALL (SELECT COUNT(*) FROM ventas GROUP BY vnt_art)));
+
+11.Listado de artículos cuyo peso es superior a alguno de los artículos de color morado.
+
+SELECT art_nom 'Nombre'
+FROM articulos
+WHERE art_peso > any (SELECT art_peso FROM articulos WHERE art_col = 'morado');
+
+
+12.Muestre todas las columnas de la tienda que ha realizado más ventas.
+
+SELECT *
+FROM tiendas
+WHERE tda_num =  (SELECT vnt_tda FROM ventas GROUP BY vnt_tda HAVING COUNT(*) >= ALL (SELECT COUNT(*) FROM ventas GROUP BY vnt_tda));
+
+
+13.Listado de clientes que sean de la misma ciudad y país que el cliente número 24.
+
+SELECT clt_nom 'Nombre', clt_apell 'Apellidos'
+FROM clientes
+WHERE (clt_pob,clt_pais) = (SELECT clt_pob,clt_pais FROM clientes WHERE clt_num = 24);
+
+14.Listado de la tabla ventas que muestre la última venta de cada artículo. La última venta es la fecha más alta (vnt_fch) en que se ha vendido cada artículo (vnt_art). El listado deberá ordenarse por código de artículo de manera ascendente.
+
+SELECT * 
+FROM ventas v1 
+WHERE vnt_fch >= ALL (SELECT vnt_fch FROM ventas v2 WHERE v1.vnt_fch = v2.vnt_fch) GROUP BY vnt_art
+ORDER BY vnt_art;
+
+
+15.Listado de tiendas para los que existe alguna venta (o que han vendido algún producto).
+
+SELECT *
+FROM tiendas
+WHERE EXISTS (SELECT * FROM ventas WHERE tda_num = vnt_tda);
+
+
+16.Listado de artículos para los que no existe nINguna compra de un cliente de Madrid.
+
+SELECT art_nom 'Nombre'
+FROM articulos
+WHERE art_num = ANY (SELECT vnt_art 'Articulo ID' FROM ventas WHERE NOT EXISTS (SELECT * FROM clientes WHERE vnt_clt = clt_num AND clt_pob = 'Madrid') GROUP BY vnt_art);
+
+17.Listado de clientes de Madrid o Barcelona que por lo menos no han hecho dos compras.
+
+SELECT clt_nom 'Nombre', clt_apell 'Apellidos', clt_pob
+FROM clientes
+WHERE clt_pob IN('Madrid','Barcelona') AND clt_num IN (SELECT vnt_clt FROM ventas GROUP BY vnt_clt HAVING COUNT(vnt_clt) < 2);
+
+
+18.Listado de proveedores que proveen algún artículo.
+
+SELECT prv_nom 'Nombre'
+FROM proveedores
+WHERE prv_num = ANY (SELECT art_prv FROM articulos WHERE prv_num = art_prv);
+
+19.Listado de tiendas que no han venido nINgún bolígrafo.
+
+SELECT *
+FROM tiendas
+WHERE tda_num NOT IN (SELECT vnt_tda FROM ventas WHERE vnt_tda IN (SELECT art_num FROM articulos WHERE art_nom LIKE 'boligrafo%'));
+
+
+20.Listado de clientes de España que han comprado más cantidad de artículos que el cliente número 17. 
+
+SELECT *
+FROM clientes
+WHERE clt_pais LIKE 'e'
+AND clt_num IN (
+SELECT vnt_clt 
+FROM ventas 
+GROUP BY vnt_clt 
+HAVING SUM(vnt_cant)>
+(SELECT SUM(vnt_cant)
+FROM ventas
+WHERE vnt_clt = 17));

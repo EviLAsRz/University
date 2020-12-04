@@ -1,0 +1,84 @@
+1.
+INSERT INTO Clientes(Cli_dni, Cli_apellidos, Cli_nombre, Cli_direccion, Cli_cp)
+VALUES ('12345678A', 'López García', 'Virginia', 'Calle Sol, 13', 11001);
+
+2.
+UPDATE Ciudades
+SET ciu_provincia = 2
+WHERE ciu_id = 3;
+
+INSERT INTO CodigosPostales 
+VALUES (11407, 3);
+
+INSERT INTO Clientes(Cli_dni, Cli_apellidos, Cli_nombre, Cli_direccion, Cli_cp)
+VALUES ('12345679B', 'Saura Pérez', 'Juan', 'Urb.Membrillar, 3, Bajo B', 11407);
+
+3.
+INSERT INTO Ciudades
+VALUES (NULL, 'El Puerto De Santa María');
+
+INSERT INTO CodigosPostales
+VALUES(11502, 6);
+
+INSERT INTO Clientes(Cli_dni, Cli_apellidos, Cli_nombre, Cli_direccion, Cli_cp)
+VALUES ('12345680C', 'Ramírez Servando', 'Ana', 'Calle Larga, 1', 11502);
+
+4.
+INSERT INTO Clientes(Cli_dni, Cli_apellidos, Cli_nombre, Cli_direccion, Cli_cp)
+VALUES ('12345681D', 'Santos Pera', 'Vicente', 'Plaza Marco Antonio, 17 Dcha', 37001);
+
+5.
+INSERT INTO Clientes(Cli_dni, Cli_apellidos, Cli_nombre, Cli_direccion, Cli_cp)
+VALUES ('12345682E', 'Larios Jardín', 'Miguel', 'Calle Roble, 4, 1ºA', 22270);
+
+6.
+INSERT INTO Cuentas
+VALUES (NULL, '21000003134567811115', 2);
+
+7.
+INSERT INTO Cuentas
+VALUES (NULL, '21000024003102575766', 3);
+
+8.
+INSERT INTO Cuentas
+VALUES (NULL, '21000024003102570000',(SELECT cli_id FROM Clientes WHERE cli_dni = '12345680c'));
+
+9.
+INSERT INTO Cuentas
+VALUES (NULL, '21000024003102571111', 5);
+
+10.
+INSERT INTO Cuentas
+VALUES (NULL, '21000024003102572222', 6);
+
+11.
+INSERT INTO Hipotecas
+VALUES (NULL, 1, 150000, 360, 2, 360, '2018-04-30');
+
+12.
+INSERT INTO Hipotecas
+VALUES (NULL,(SELECT cue_id FROM Cuentas WHERE cue_cliente = (SELECT cli_id FROM Clientes WHERE cli_dni = '12345680c')), 150000, 360, 2, 360, '2018-04-30');
+
+13.
+UPDATE Clientes
+SET cli_nombre = 'Laura'
+WHERE cli_id = 4;
+
+14.
+UPDATE Clientes
+SET cli_cp = 11045
+WHERE cli_id = 3;
+
+DELETE FROM CodigosPostales
+WHERE cp_cp = 11407;
+
+INSERT INTO CodigosPostales
+VALUES (11045, 3);
+
+15.
+
+DELETE FROM Cuentas
+WHERE cue_cliente = 6;
+
+DELETE FROM Clientes
+WHERE cli_id = 6;

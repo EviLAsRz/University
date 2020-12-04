@@ -1,0 +1,192 @@
+1. Listado de artículos cuyo precio sea superior a 10 euros junto con el proveedor que lo proporciona. El listado debe mostrar: nombre del artículo, color del artículo, precio de compra y nombre del proveedor. El listado se debe ordenar alfabéticamente por nombre del artículo.
+
+SELECT art_nom 'Nombre', art_col 'Color', art_pc 'Precio de Compra', prv_nom 'Nombre Proveedor'
+FROM articulos, proveedores
+WHERE art_prv = prv_num AND art_pc > 10
+ORDER BY art_nom;
+
+2. Listado de tiendas junto con las ventas que han hecho en febrero de 2020. El listado debe mostrar todas columnas de la tabla tiendas con la fecha de cada venta. El listado deberá ordenarse por fecha de venta de manera DESCendente y por nombre de gerente de la tienda alfabéticamente cuANDo la fecha coINcida.
+
+SELECT tiendas.*, vnt_fch
+FROM tiendas, ventas
+WHERE tda_num = vnt_tda AND vnt_fch LIKE '2020-02%'
+ORDER BY vnt_fch DESC, tda_ger ASC;
+
+3. Listado de clientes que son de la misma población que el cliente número 5. El listado deberá mostrar todas las columnas de la tabla clientes y no deberá listar el registro para el cliente número 5.
+
+SELECT c.* FROM clientes c, clientes d
+WHERE c.clt_pob = d.clt_pob AND d.clt_num = 5 AND c.clt_num NOT LIKE '5';
+
+
+4. Listado de artículos de color azul, rosa o verde junto con su peso. El listado debe mostrar el número, nombre, color, obtenidos de la tabla artículos y el peso, obtenido a partir de la clasificación de la tabla pesos. Por ejemplo, si un artículo pesa 10, su peso será leve ya que está comprendido entre el peso_mIN (1) y el peso_max(100). 
+
+SELECT art_nom 'Nombre', art_num 'Numero', art_col 'Color', peso_nom 'Tipo de Peso'
+FROM articulos, pesos
+WHERE art_peso BETWEEN peso_mIN AND peso_max AND art_col IN('azul','rosa','verde');
+
+
+5. Listado que muestre las ventas que los clientes de Barcelona han hecho en las tiendas que no son de Barcelona. El listado deberá mostrar el nombre, apellidos y población del cliente, la población de la tienda y la fecha de las ventas.
+
+SELECT clt_nom 'Nombre', clt_apell 'Apellidos', clt_pob 'Poblacion', tda_pob 'Poblacion Tienda', vnt_fch 'Fecha venta'
+FROM clientes,tiendas,ventas
+WHERE clt_num = vnt_clt AND vnt_tda = tda_num AND clt_pob LIKE 'Barcelona' AND tda_pob NOT LIKE 'Barcelona';
+
+6. Listado que muestre aquellos clientes que han realizado más de 2 compras y esté ordenado de mayor a menor ventas realizadas. El listado deberá mostrar el número, apellido y nombre del cliente, así como la cantidad de compras realizada.
+
+SELECT clt_nom 'Nombre', clt_apell 'Apellidos', clt_num 'Numero', COUNT(*) 'Nº Compras'
+FROM clientes ,ventas
+WHERE clt_num = vnt_clt GROUP BY clt_nom, clt_apell, clt_num HAVING COUNT(*) > 2 ORDER BY COUNT(*) DESC;
+
+
+7. Listado de tiendas junto con la cantidad de clientes distINtos que han comprado en dichas tiendas. El listado deberá mostrar dos columnas: población de la tienda (tda_pob) y cantidad de clientes distINtos (el código de los clientes en las ventas se INdica en la columna vnt_clt). El listado deberá ordenarse por la segunda columna de manera DESCendente.
+
+SELECT tda_pob 'Poblacion tiendas', COUNT(DISTINCT vnt_clt)'Clientes distintos'
+FROM tiendas, ventas
+WHERE tda_num = vnt_tda
+GROUP BY tda_pob
+ORDER BY 2 DESC;
+
+ 
+8. Listado de ventas que muestre para cada color la cantidad de artículos vendidos de ese color y la cantidad de artículos diferentes. Ordene la consulta por la segunda y tercera columna de manera DESCendente.
+
+SELECT art_col 'Color', COUNT(*) 'Articulos diferentes', COUNT(DISTINCT art_num)'Articulos dist/color'
+FROM ventas, articulos
+WHERE art_num = vnt_art AND art_Col IS NOT NULL
+GROUP BY art_col
+ORDER BY 2,3 DESC;
+
+9. Listado de artículos vendidos por cada proveedor. El listado mostrará dos columnas: el nombre del proveedor y la cantidad de ventas de los artículos de cada proveedor.
+
+SELECT prv_nom 'Nombre de Proveedor',COUNT(*) 'Ventas/proveedor'
+FROM proveedores,articulos,ventas
+WHERE prv_num = art_prv AND art_num = vnt_art
+GROUP BY art_prv;
+
+
+10. Listado que muestre la siguiente INformación de las ventas. Las columnas deben mostrar la INformación y cabeceras tal y como se muestran en el siguiente ejemplo. Ordene el resultado por fecha de manera ASCendente. 
+ 
+SELECT concat(clt_nom," ",clt_apell) 'Cliente',tda_pob 'Tienda', art_nom 'Articulo', vnt_cant 'Cantidad' , vnt_fch 'Fecha'
+FROM clientes, tiendas, ventas, articulos 
+WHERE clt_num = vnt_clt AND tda_num = vnt_tda AND art_num = vnt_art
+ORDER BY vnt_fch;
+
+11. Listado de artículos que se han vendido tanto en enero como en febrero
+
+1º: SELECT art_nom, art_num 
+FROM articulos JOIN ventas ON art_num  = vnt_art 
+WHERE vnt_fch BETWEEN '2020-01-01' AND '2020-02-29'
+GROUP BY art_nom;
+
+2º: SELECT art_nom, art_num FROM articulos
+WHERE art_num IN (SELECT vnt_art
+FROM ventas
+WHERE vnt_fch BETWEEN '2020-01-01' AND '2020-01-31')
+OR
+art_num IN (SELECT vnt_art
+FROM ventas
+WHERE vnt_fch BETWEEN '2020-02-01' AND '2020-02-29');
+
+12. Listado de tiendas que han vendido en febrero menos las tiendas que han vendido en
+enero. Ordenado por código de tienda.
+
+SELECT *
+FROM tiendas
+WHERE tda_num IN (SELECT vnt_tda
+FROM ventas
+WHERE vnt_fch BETWEEN '2020-02-01' AND '2020-02-29')
+AND
+tda_num NOT IN (SELECT vnt_tda
+FROM ventas
+WHERE vnt_fch BETWEEN '2020-01-01' AND '2020-01-31')
+ORDER BY tda_num;
+
+13. Listado de proveedores que una aquellos que han vendido algún producto en enero
+junto con aquellos de los que se ha vendido algún producto en febrero.
+
+SELECT * FROM proveedores
+WHERE prv_num IN (SELECT art_prv
+FROM articulos
+WHERE art_num IN(SELECT vnt_art
+FROM ventas
+WHERE vnt_fch BETWEEN '2020-01-01' AND '2020-01-31')) 
+OR 
+prv_num IN (SELECT art_prv 
+FROM articulos 
+WHERE art_num IN(SELECT vnt_art 
+FROM ventas
+WHERE vnt_fch BETWEEN '2020-02-01' AND '2020-02-29'))
+ORDER BY prv_num;
+
+14. Listado que muestre la cantidad de artículos comprada por cada cliente. La cantidad
+de artículos es la suma de los vnt_cant de las ventas a cada cliente. Si un cliente no ha
+comprado ningún artículo también deberá aparecer en el listado. En este caso, deberá
+aparecer un 0 en la cantidad comprada.
+
+SELECT concat(clt_nom," ",clt_apell) 'Nombre', clt_num 'Numero', IFNULL(SUM(vnt_cant),0) 'Cantidad'
+FROM clientes LEFT OUTER JOIN ventas ON clt_num = vnt_clt
+GROUP BY clt_num
+ORDER BY 2;
+
+15. Listado que muestre las ventas de los artículos junto con que clientes lo compraron. Si
+un artículo no ha sido comprado, también deberá aparecer en el listado.
+
+SELECT art_nom 'Articulo' ,IFNULL(sum(vnt_cant),0) 'Nº Ventas', concat(clt_nom," ",clt_apell) 'Nombre'
+FROM articulos JOIN ventas JOIN clientes ON art_num = vnt_art AND clt_num = vnt_clt
+GROUP BY art_nom, clt_nom
+ORDER BY 2 DESC;
+ 
+16. Listado de ventas de las tiendas que han vendido más que alguna de las tiendas de
+Madrid. El listado debe mostrar para cada tienda la siguiente información:
+Población, Gerente, Número de ventas realizada, media de cantidad vendida en cada
+venta. Las tiendas de Madrid no deberán aparecer en el listado.
+
+SELECT a.tda_pob 'Poblacion',a.tda_ger 'Gerente', IFNULL(SUM(vnt_cant),0) 'Nº Ventas', AVG(vnt_cant) 'Media de Ventas'
+FROM tiendas a JOIN tiendas b JOIN ventas ON a.tda_num = vnt_tda AND b.tda_num = vnt_tda
+WHERE b.tda_pob NOT LIKE 'Madrid%' AND a.tda_num IN (SELECT vnt_tda
+FROM ventas
+WHERE vnt_cant > ANY(SELECT vnt_cant
+FROM ventas
+WHERE vnt_tda = ALL (SELECT tda_num
+FROM tiendas
+WHERE tda_pob LIKE 'Madrid')))
+GROUP BY a.tda_num;
+
+
+17. Listado de clientes de Madrid que han comprado algún producto del proveedor
+‘electrolamp’.
+
+SELECT CONCAT(clt_nom," ",clt_apell) 'Nombre'
+FROM clientes JOIN ventas JOIN articulos JOIN proveedores ON clt_num = vnt_clt AND vnt_art = art_num AND prv_num = art_prv
+WHERE clt_pob LIKE 'Madrid%' AND prv_nom LIKE 'Electrolamp%';
+
+18. Listado de tiendas en las que han comprado clientes cuya población no sea ni Madrid ni
+Barcelona. El listado deberá mostrar la cantidad de ventas realizada por cada tienda.
+
+SELECT tda_num 'Numero', tda_pob 'Poblacion', tda_ger 'Gerente', count(*) 'Nº de Ventas'
+FROM tiendas JOIN ventas ON tda_num = vnt_tda
+WHERE vnt_clt IN(SELECT clt_num
+FROM clientes
+WHERE clt_pob NOT IN('Madrid','Barcelona'))
+GROUP BY tda_num;
+
+
+19. Listado de artículos vendidos en la campaña de navidad 2019-20. La campaña de
+navidad va del 6 de diciembre al 6 de enero. Interesa conocer la cantidad vendida de
+cada artículo y cuál fue la última fecha de compra del mismo.
+
+SELECT art_nom 'Articulo', IFNULL(sum(vnt_cant),0) 'Cantidad de Ventas', vnt_fch 'Fecha de Venta'
+FROM articulos JOIN ventas ON art_num = vnt_art
+WHERE vnt_fch BETWEEN '2019-12-06' AND '2020-01-06'
+GROUP BY art_nom;
+
+
+20. Obtener el número, nombre y apellido de los clientes, así como el número de veces que
+ha comprado algún objeto y el total en euros que se ha gastado. Si un cliente no ha
+realizado ninguna compra debe aparecer también en la tabla indicado que se ha
+gastado 0 €. Lo que un cliente se ha gastado en una venta es el producto de la columna
+art_pv con la columna vnt_cant (precio de venta por la cantidad comprada).
+
+SELECT clt_num 'Numero', CONCAT(clt_nom," ",clt_apell) 'Nombre',IFNULL(SUM(vnt_cant),0)'Cantidad',art_nom 'Articulo',CONCAT(FORMAT(art_pv * SUM(vnt_cant),1),"",'€')'Dinero Gastado'
+FROM clientes JOIN articulos JOIN ventas ON clt_num = vnt_clt AND art_num = vnt_art
+GROUP BY clt_num, vnt_art
+ORDER BY clt_num;
